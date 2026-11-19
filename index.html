@@ -1,0 +1,215 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>恋する物理教師・田所千佳</title>
+<style>
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  background:#171526;
+  color:#fff;
+  font-family:"Yu Gothic",sans-serif;
+  display:flex;
+  justify-content:center;
+  min-height:100vh;
+}
+.game {
+  width:100%;
+  max-width:720px;
+  background:#29253c;
+  min-height:100vh;
+  padding:20px;
+}
+h1 { text-align:center;color:#ffb9d0;font-size:25px; }
+.subtitle {text-align:center;color:#aaa;font-size:13px;}
+.character {
+  margin:20px auto;
+  height:270px;
+  background:linear-gradient(145deg,#65546b,#302b45);
+  border-radius:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  overflow:hidden;
+}
+.face {
+  font-size:110px;
+  filter:drop-shadow(0 5px 5px #222);
+}
+.charname {font-size:20px;color:#ffd2df;font-weight:bold;}
+.status {
+  display:flex;
+  justify-content:space-between;
+  font-size:13px;
+  background:#403950;
+  padding:12px;
+  border-radius:10px;
+}
+.bar {
+  background:#555;
+  height:9px;
+  border-radius:10px;
+  margin-top:8px;
+  overflow:hidden;
+}
+.fill {
+  height:100%;
+  background:#ff83ad;
+  width:20%;
+  transition:.3s;
+}
+.dialogue {
+  margin-top:18px;
+  background:#f5edf2;
+  color:#30253b;
+  padding:20px;
+  border-radius:14px;
+  min-height:150px;
+  line-height:1.9;
+}
+.speaker {font-weight:bold;color:#bd477b;margin-bottom:8px;}
+.choices {display:grid;gap:10px;margin-top:18px;}
+button {
+  border:1px solid #806b8e;
+  border-radius:10px;
+  padding:14px;
+  background:#48405d;
+  color:white;
+  font-size:15px;
+  cursor:pointer;
+  text-align:left;
+}
+button:hover {background:#79516f;}
+button:disabled {opacity:.5;}
+#restart {
+  display:none;
+  margin:20px auto;
+  text-align:center;
+  background:#a84c78;
+}
+</style>
+</head>
+<body>
+<div class="game">
+<h1>💗 恋する物理教師・田所千佳 💗</h1>
+<div class="subtitle">～土佐弁と万有引力の恋物語～</div>
+
+<div class="character">
+  <div class="face" id="face">👩🏻‍🏫</div>
+  <div class="charname">田所 千佳（たどころ ちか）</div>
+  <div style="font-size:12px;margin-top:5px">高知県出身・物理教師・推定50代</div>
+</div>
+
+<div class="status">
+  <span>❤️ 千佳の好感度</span>
+  <span id="score">20 / 100</span>
+</div>
+<div class="bar"><div class="fill" id="bar"></div></div>
+
+<div class="dialogue">
+  <div class="speaker" id="speaker">田所千佳</div>
+  <div id="message">あんたが今日から一緒に働く人かえ？うちは田所千佳。物理を教えゆうきね。よろしく頼むぜよ。</div>
+</div>
+
+<div class="choices" id="choices">
+  <button onclick="choose(1)">①「よろしくお願いします！先生、素敵ですね」</button>
+  <button onclick="choose(2)">②「高知出身なんですか？土佐弁いいですね」</button>
+  <button onclick="choose(3)">③「先生、ずいぶん痩せていますね……」</button>
+</div>
+
+<button id="restart" onclick="restart()">もう一度プレイする</button>
+</div>
+
+<script>
+let affection = 20;
+let day = 0;
+
+const scenes = [
+[
+["ふふっ、口がうまい人やねえ。ほんまにそう思うちゅうが？",
+ "そりゃ嬉しいちや！もっと言うてみいや。",
+ "なんや、急にお世辞かえ？"],
+["高知はえいところぜよ。カツオも酒も最高やきね！",
+ "土佐弁が好きなが？ほいたらいっぱい聞かせちゃお。",
+ "高知に来たことあるが？"],
+["なんちゃあない。昔からこんな体型ながよ。",
+ "あんた、よう見ちゅうねえ。食べても太らんがよ。",
+ "失礼な人やねえ！物理的に傷ついたちや！"]
+],
+[
+["あんたと話しよったら時間が経つが早いねえ。",
+ "今度、二人で喫茶店でも行かんかえ？",
+ "うちをからかいゆうがやないろうね？"],
+["土佐の女は気が強い言われるけんど、うちは優しいで？",
+ "今度、高知の郷土料理を食べに行こうや。",
+ "坂本龍馬もびっくりするくらい嬉しいちや！"],
+["最近、ちゃんと食べゆうか心配してくれるが？",
+ "あんたの前では格好つけたいがやけん。",
+ "そんなに心配なら食事に付き合うてや。"]
+],
+[
+["あんたとおると、なんか重力みたいに引き寄せられるがよ。",
+ "これって恋かもしれんねえ……。",
+ "うち、あんたのことが好きになっちゅうかもしれん。"],
+["高知の海を一緒に見に行かんかえ？",
+ "あんたとおる未来も、悪うないと思うちゅう。",
+ "もう離れとうないと思うがよ。"],
+["痩せちゅう言われるけんど、心は誰よりも熱いがぜよ。",
+ "あんたのためなら、毎日お弁当作るきね。",
+ "うちのこと、ちゃんと見てくれちゅうがやね。"]
+]
+];
+
+function choose(option) {
+  const bonus = [12,15,-8][option-1];
+  affection = Math.max(0,Math.min(100,affection+bonus));
+  day++;
+
+  document.getElementById("score").textContent=affection+" / 100";
+  document.getElementById("bar").style.width=affection+"%";
+
+  if(day>=3) {
+    ending();
+    return;
+  }
+
+  const scene=scenes[day-1][option-1];
+  document.getElementById("message").textContent=scene[Math.min(2,Math.floor(Math.random()*3))];
+  document.getElementById("face").textContent=affection>=45?"🥰":"👩🏻‍🏫";
+  document.getElementById("speaker").textContent="田所千佳";
+  const buttons=document.querySelectorAll(".choices button");
+  buttons[0].textContent="①「先生ともっと話したいです」";
+  buttons[1].textContent="②「今度一緒に出かけませんか？」";
+  buttons[2].textContent="③「物理の授業、教えてください」";
+  buttons.forEach((b,i)=>b.onclick=()=>choose(i+1));
+}
+
+function ending(){
+  document.getElementById("choices").style.display="none";
+  document.getElementById("restart").style.display="block";
+  document.getElementById("face").textContent=affection>=55?"💗":"👩🏻‍🏫";
+  document.getElementById("speaker").textContent="最終エンディング";
+
+  let result;
+  if(affection>=65){
+    result="【トサ・ラブエンド】\n「うちもあんたが好きぜよ！」千佳は笑顔であなたの手を握った。二人は高知の海へ旅行することに。恋の万有引力は、もう止められない。";
+  }else if(affection>=35){
+    result="【友達以上エンド】\n「また一緒にご飯でも行こうや」千佳は優しく微笑んだ。二人の関係は、まだこれから。";
+  }else{
+    result="【ニュートンも驚くすれ違いエンド】\n「ほいたら、また明日ね」千佳は職員室へ戻っていった。恋の引力はまだ弱かったようだ……。";
+  }
+  document.getElementById("message").textContent=result;
+}
+
+function restart(){
+  affection=20;
+  day=0;
+  location.reload();
+}
+</script>
+</body>
+</html>
