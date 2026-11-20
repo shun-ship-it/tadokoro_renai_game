@@ -6,210 +6,363 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>恋する物理教師・田所千佳</title>
 <style>
-* { box-sizing:border-box; }
+* {box-sizing:border-box;}
 body {
-  margin:0;
-  background:#171526;
-  color:#fff;
-  font-family:"Yu Gothic",sans-serif;
-  display:flex;
-  justify-content:center;
-  min-height:100vh;
+ margin:0;background:#171526;color:white;
+ font-family:"Yu Gothic",sans-serif;
+ display:flex;justify-content:center;min-height:100vh;
 }
 .game {
-  width:100%;
-  max-width:720px;
-  background:#29253c;
-  min-height:100vh;
-  padding:20px;
+ width:100%;max-width:720px;background:#29253c;
+ min-height:100vh;padding:20px;
 }
-h1 { text-align:center;color:#ffb9d0;font-size:25px; }
+h1 {text-align:center;color:#ffb9d0;font-size:23px;}
 .subtitle {text-align:center;color:#aaa;font-size:13px;}
 .character {
-  margin:20px auto;
-  height:270px;
-  background:linear-gradient(145deg,#65546b,#302b45);
-  border-radius:18px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex-direction:column;
-  overflow:hidden;
+ margin:20px auto;height:250px;
+ background:linear-gradient(145deg,#65546b,#302b45);
+ border-radius:18px;display:flex;align-items:center;
+ justify-content:center;flex-direction:column;
 }
-.face {
-  font-size:110px;
-  filter:drop-shadow(0 5px 5px #222);
-}
+.face {font-size:100px;filter:drop-shadow(0 5px 5px #222);}
 .charname {font-size:20px;color:#ffd2df;font-weight:bold;}
+.location {font-size:13px;color:#ddd;margin-top:5px;}
 .status {
-  display:flex;
-  justify-content:space-between;
-  font-size:13px;
-  background:#403950;
-  padding:12px;
-  border-radius:10px;
+ display:flex;justify-content:space-between;
+ font-size:13px;background:#403950;
+ padding:12px;border-radius:10px;
 }
 .bar {
-  background:#555;
-  height:9px;
-  border-radius:10px;
-  margin-top:8px;
-  overflow:hidden;
+ background:#555;height:10px;border-radius:10px;
+ margin-top:8px;overflow:hidden;
 }
 .fill {
-  height:100%;
-  background:#ff83ad;
-  width:20%;
-  transition:.3s;
+ height:100%;background:#ff83ad;width:20%;
+ transition:.4s;
+}
+.day {
+ text-align:center;color:#ffd2df;margin-top:15px;
+ font-weight:bold;
 }
 .dialogue {
-  margin-top:18px;
-  background:#f5edf2;
-  color:#30253b;
-  padding:20px;
-  border-radius:14px;
-  min-height:150px;
-  line-height:1.9;
+ margin-top:15px;background:#f5edf2;color:#30253b;
+ padding:20px;border-radius:14px;
+ min-height:160px;line-height:1.9;
+ white-space:pre-line;
 }
 .speaker {font-weight:bold;color:#bd477b;margin-bottom:8px;}
 .choices {display:grid;gap:10px;margin-top:18px;}
 button {
-  border:1px solid #806b8e;
-  border-radius:10px;
-  padding:14px;
-  background:#48405d;
-  color:white;
-  font-size:15px;
-  cursor:pointer;
-  text-align:left;
+ border:1px solid #806b8e;border-radius:10px;
+ padding:14px;background:#48405d;color:white;
+ font-size:14px;cursor:pointer;text-align:left;
 }
 button:hover {background:#79516f;}
-button:disabled {opacity:.5;}
 #restart {
-  display:none;
-  margin:20px auto;
-  text-align:center;
-  background:#a84c78;
+ display:none;margin:20px auto;text-align:center;
+ background:#a84c78;width:100%;
 }
+.notice {text-align:center;color:#aaa;font-size:12px;margin-top:12px;}
 </style>
 </head>
 <body>
 <div class="game">
+
 <h1>💗 恋する物理教師・田所千佳 💗</h1>
 <div class="subtitle">～土佐弁と万有引力の恋物語～</div>
 
 <div class="character">
-  <div class="face" id="face">👩🏻‍🏫</div>
-  <div class="charname">田所 千佳（たどころ ちか）</div>
-  <div style="font-size:12px;margin-top:5px">高知県出身・物理教師・推定50代</div>
+ <div class="face" id="face">👩🏻‍🏫</div>
+ <div class="charname">田所 千佳（たどころ ちか）</div>
+ <div class="location" id="location">高知県出身・物理教師・推定70代</div>
 </div>
 
 <div class="status">
-  <span>❤️ 千佳の好感度</span>
-  <span id="score">20 / 100</span>
+ <span>❤️ 千佳の好感度</span>
+ <span id="score">20 / 100</span>
 </div>
 <div class="bar"><div class="fill" id="bar"></div></div>
 
+<div class="day" id="day">第1日目・新しい出会い</div>
+
 <div class="dialogue">
-  <div class="speaker" id="speaker">田所千佳</div>
-  <div id="message">あんたが今日から一緒に働く人かえ？うちは田所千佳。物理を教えゆうきね。よろしく頼むぜよ。</div>
+ <div class="speaker" id="speaker">田所千佳</div>
+ <div id="message">あんたが今日から一緒に働く人かえ？うちは田所千佳。物理を教えゆうきね。よろしく頼むぜよ。</div>
 </div>
 
 <div class="choices" id="choices">
-  <button onclick="choose(1)">①「よろしくお願いします！先生、素敵ですね」</button>
-  <button onclick="choose(2)">②「高知出身なんですか？土佐弁いいですね」</button>
-  <button onclick="choose(3)">③「先生、ずいぶん痩せていますね……」</button>
+ <button onclick="choose(0)">① よろしくお願いします！先生、素敵ですね</button>
+ <button onclick="choose(1)">② 高知出身なんですか？土佐弁いいですね</button>
+ <button onclick="choose(2)">③ 先生、物理を教えてください！</button>
 </div>
 
-<button id="restart" onclick="restart()">もう一度プレイする</button>
+<button id="restart" onclick="restart()">🔄 もう一度プレイする</button>
+<div class="notice">選択によって恋の行方が変わります……。</div>
+
 </div>
 
 <script>
-let affection = 20;
-let day = 0;
+let affection=20;
+let day=0;
 
-const scenes = [
-[
-["ふふっ、口がうまい人やねえ。ほんまにそう思うちゅうが？",
- "そりゃ嬉しいちや！もっと言うてみいや。",
- "なんや、急にお世辞かえ？"],
-["高知はえいところぜよ。カツオも酒も最高やきね！",
- "土佐弁が好きなが？ほいたらいっぱい聞かせちゃお。",
- "高知に来たことあるが？"],
-["なんちゃあない。昔からこんな体型ながよ。",
- "あんた、よう見ちゅうねえ。食べても太らんがよ。",
- "失礼な人やねえ！物理的に傷ついたちや！"]
-],
-[
-["あんたと話しよったら時間が経つが早いねえ。",
- "今度、二人で喫茶店でも行かんかえ？",
- "うちをからかいゆうがやないろうね？"],
-["土佐の女は気が強い言われるけんど、うちは優しいで？",
- "今度、高知の郷土料理を食べに行こうや。",
- "坂本龍馬もびっくりするくらい嬉しいちや！"],
-["最近、ちゃんと食べゆうか心配してくれるが？",
- "あんたの前では格好つけたいがやけん。",
- "そんなに心配なら食事に付き合うてや。"]
-],
-[
-["あんたとおると、なんか重力みたいに引き寄せられるがよ。",
- "これって恋かもしれんねえ……。",
- "うち、あんたのことが好きになっちゅうかもしれん。"],
-["高知の海を一緒に見に行かんかえ？",
- "あんたとおる未来も、悪うないと思うちゅう。",
- "もう離れとうないと思うがよ。"],
-["痩せちゅう言われるけんど、心は誰よりも熱いがぜよ。",
- "あんたのためなら、毎日お弁当作るきね。",
- "うちのこと、ちゃんと見てくれちゅうがやね。"]
-]
+const scenes=[
+
+// 1
+{
+ title:"第1日目・新しい出会い",
+ place:"職員室",
+ face:"👩🏻‍🏫",
+ intro:"あんたが今日から一緒に働く人かえ？うちは田所千佳。物理を教えゆうきね。よろしく頼むがよ。",
+ choices:[
+ ["よろしくお願いします！先生、素敵ですね","ふふっ、いきなり褒めるがかえ？口がうまい人やねえ。","+12"],
+ ["高知出身なんですか？土佐弁いいですね","おっ、土佐弁がわかるがか！高知はえいところがよ！","+15"],
+ ["先生、ずいぶん痩せていますね……","な、なんや急に！初対面でそこを見るがかえ！？","-8"]
+ ]
+},
+
+// 2
+{
+ title:"第2日目・朝の職員室",
+ place:"職員室",
+ face:"☕",
+ intro:"おはようさん。朝から忙しいねえ。うちはコーヒーを飲まんと頭が働かんがよ。",
+ choices:[
+ ["先生の分もコーヒーを買ってきました！","おお！気が利くやないか。あんた、なかなかえい人やね。","+15"],
+ ["先生、朝から元気ですね","元気に見えるかえ？実はちょっと眠いがよ。","+8"],
+ ["コーヒーより物理の公式ですよ","朝から公式の話かえ！頭が痛うなるちや。","-5"]
+ ]
+},
+
+// 3
+{
+ title:"第3日目・物理の授業",
+ place:"理科室",
+ face:"👩🏻‍🏫",
+ intro:"今日は万有引力について教えるぜよ。すべての物体は互いに引き合うがやき。",
+ choices:[
+ ["先生と僕にも引力がありますね","なんちゅうことを言うが！……でも、嫌いやないちや。","+18"],
+ ["ニュートンはすごいですね","そうながよ！りんごが落ちた話は有名やねえ。","+8"],
+ ["重力なんてなくてもいいのでは？","それじゃあ、うちらも宇宙に飛んでいくがよ！","-5"]
+ ]
+},
+
+// 4
+{
+ title:"第4日目・昼休み",
+ place:"学校の食堂",
+ face:"🍱",
+ intro:"あら、昼ご飯ながかえ？うちは今日はお弁当を持ってきたがよ。ちょっと見てみるかえ？",
+ choices:[
+ ["先生の手作りですか？食べてみたいです！","そうながよ。ちょっと恥ずかしいけんど、味は保証するちや！","+15"],
+ ["カツオのたたきは入っていますか？","高知といえばカツオぜよ！今日は入っちゅうで！","+12"],
+ ["先生、もっと野菜を食べた方がいいですよ","あんたは健康診断の先生かえ！","+2"]
+ ]
+},
+
+// 5
+{
+ title:"第5日目・放課後の相談",
+ place:"職員室",
+ face:"🥰",
+ intro:"あんた、まだ残っちゅうがか？うちは今から教材を作るところながよ。",
+ choices:[
+ ["何か手伝いましょうか？","ほんまに？助かるちや。あんたは優しいねえ。","+15"],
+ ["一緒に帰りませんか？","えっ、一緒に？……まあ、ちょっとだけならえいよ。","+18"],
+ ["先生、仕事が遅いですね","失礼な人やねえ！うちも一生懸命やっちゅう！","-12"]
+ ]
+},
+
+// 6
+{
+ title:"第6日目・喫茶店",
+ place:"駅前の喫茶店",
+ face:"☕",
+ intro:"今日は一緒に喫茶店に来てしもうたねえ。こうして二人で話すのも悪うないちや。",
+ choices:[
+ ["先生といると落ち着きます","うちもそうながよ。なんか不思議な感じやねえ。","+18"],
+ ["先生の昔の話を聞きたいです","昔の話かえ？高知で過ごした学生時代は楽しかったがよ。","+12"],
+ ["先生、甘いもの好きですか？","大好きながよ！ケーキなら何個でも食べられるちや！","+10"]
+ ]
+},
+
+// 7
+{
+ title:"第7日目・雨の日",
+ place:"学校の玄関",
+ face:"🌧️",
+ intro:"あら、雨が降りゆうねえ。傘を忘れてしもうた。どうしようかねえ……。",
+ choices:[
+ ["僕の傘に入りませんか？","えいがかえ？ほいたら、お言葉に甘えようかね。","+20"],
+ ["タクシーを呼びましょうか？","気を遣うてくれてありがとう。優しいねえ。","+12"],
+ ["走れば大丈夫ですよ！","うちはそんなに若うないがやき！風邪ひくちや！","-5"]
+ ]
+},
+
+// 8
+{
+ title:"第8日目・高知の思い出",
+ place:"学校の屋上",
+ face:"🌅",
+ intro:"高知の海はほんまにきれいやったがよ。夕日を見よったら、昔のことを思い出すちや。",
+ choices:[
+ ["いつか一緒に高知へ行きたいです","ほんまかえ？あんたと行けたら楽しいろうねえ。","+20"],
+ ["坂本龍馬が好きなんですか？","もちろんぜよ！高知の誇りやきね！","+12"],
+ ["僕は都会の方が好きです","まあ、都会も便利やけんどねえ。","+3"]
+ ]
+},
+
+// 9
+{
+ title:"第9日目・休日の電話",
+ place:"休日・自宅",
+ face:"📱",
+ intro:"もしもし？千佳やけんど。休日にごめんねえ。ちょっと声が聞きとうなってしもうて。",
+ choices:[
+ ["僕も先生の声が聞きたかったです","……もう、そんなこと言われたら照れるやいか。","+22"],
+ ["何か困ったことでもありましたか？","ううん、何もないがよ。ただ話したかっただけ。","+15"],
+ ["今、忙しいので切ります","あっ、そうながか……ほいたらまたね。","-15"]
+ ]
+},
+
+// 10
+{
+ title:"第10日目・二人きりの放課後",
+ place:"理科準備室",
+ face:"💗",
+ intro:"最近、あんたと話す時間が楽しみになっちゅう。これってどういうことながやろうねえ。",
+ choices:[
+ ["それは恋じゃないですか？","こ、恋！？……そんなこと言われたら意識するやいか。","+22"],
+ ["僕も先生に会うのが楽しみです","ほんまに？うちも同じ気持ちやが。","+20"],
+ ["仕事に集中しましょう","そ、そうやね。仕事せんといかんねえ……。","-12"]
+ ]
+},
+
+// 11
+{
+ title:"第11日目・夕暮れの帰り道",
+ place:"学校近くの公園",
+ face:"🌇",
+ intro:"もう夕方やねえ。あんたと歩きゆうと、時間があっという間に過ぎるがよ。",
+ choices:[
+ ["もっと一緒にいたいです","うちも……もう少しだけ一緒におりたいがや。","+22"],
+ ["今度、二人で旅行しませんか？","旅行！？高知の海や山を案内しちゃおうかね。","+18"],
+ ["明日も仕事ですね","そうながよ。明日も頑張らんといかんねえ。","+5"]
+ ]
+},
+
+// 12
+{
+ title:"第12日目・運命の告白",
+ place:"学校の屋上",
+ face:"💗",
+ intro:"今日は伝えたいことがあるがよ。あんたと出会ってから、毎日が楽しくなったがやき。うちの気持ち、聞いてくれるかえ？",
+ choices:[
+ ["先生が好きです。付き合ってください！","……うちもあんたが好きやきぃね。ずっと一緒におりたいが。","+25"],
+ ["これからもそばにいてください","もちろんやき。これからも一緒におろうねえ。","+20"],
+ ["やっぱり先生と生徒・同僚の関係でいましょう","そうながか……。でも、あんたと出会えてよかったよ。","+0"]
+ ]
+}
+
 ];
 
-function choose(option) {
-  const bonus = [12,15,-8][option-1];
-  affection = Math.max(0,Math.min(100,affection+bonus));
+function updateStatus(){
+ document.getElementById("score").textContent=affection+" / 100";
+ document.getElementById("bar").style.width=affection+"%";
+}
+
+function showScene(){
+ const s=scenes[day];
+
+ document.getElementById("day").textContent=s.title;
+ document.getElementById("location").textContent=s.place;
+ document.getElementById("face").textContent=s.face;
+ document.getElementById("speaker").textContent="田所千佳";
+ document.getElementById("message").textContent=s.intro;
+
+ const box=document.getElementById("choices");
+ box.innerHTML="";
+
+ s.choices.forEach((choice,i)=>{
+  const btn=document.createElement("button");
+  btn.textContent=["① ","② ","③ "][i]+choice[0];
+  btn.onclick=()=>choose(i);
+  box.appendChild(btn);
+ });
+}
+
+function choose(index){
+ const s=scenes[day];
+ const choice=s.choices[index];
+
+ affection=Math.max(0,Math.min(100,
+ affection+Number(choice[2])));
+
+ updateStatus();
+
+ document.getElementById("speaker").textContent="田所千佳";
+ document.getElementById("message").textContent=
+ choice[1]+"\n\n（好感度 "+(choice[2].startsWith("-")?"":"+")+choice[2]+"）";
+
+ document.getElementById("face").textContent=
+ affection>=70?"🥰":affection>=40?"😊":"👩🏻‍🏫";
+
+ const box=document.getElementById("choices");
+ box.innerHTML="";
+
+ const btn=document.createElement("button");
+ btn.textContent=day===11?"💗 最終結果を見る":"▶ 次の日へ進む";
+ btn.style.textAlign="center";
+ btn.onclick=()=>{
   day++;
-
-  document.getElementById("score").textContent=affection+" / 100";
-  document.getElementById("bar").style.width=affection+"%";
-
-  if(day>=3) {
-    ending();
-    return;
+  if(day>=scenes.length){
+   ending();
+  }else{
+   showScene();
   }
-
-  const scene=scenes[day-1][option-1];
-  document.getElementById("message").textContent=scene[Math.min(2,Math.floor(Math.random()*3))];
-  document.getElementById("face").textContent=affection>=45?"🥰":"👩🏻‍🏫";
-  document.getElementById("speaker").textContent="田所千佳";
-  const buttons=document.querySelectorAll(".choices button");
-  buttons[0].textContent="①「先生ともっと話したいです」";
-  buttons[1].textContent="②「今度一緒に出かけませんか？」";
-  buttons[2].textContent="③「物理の授業、教えてください」";
-  buttons.forEach((b,i)=>b.onclick=()=>choose(i+1));
+ };
+ box.appendChild(btn);
 }
 
 function ending(){
-  document.getElementById("choices").style.display="none";
-  document.getElementById("restart").style.display="block";
-  document.getElementById("face").textContent=affection>=55?"💗":"👩🏻‍🏫";
-  document.getElementById("speaker").textContent="最終エンディング";
+ document.getElementById("day").textContent="最終日・エンディング";
+ document.getElementById("location").textContent="二人の未来";
+ document.getElementById("speaker").textContent="最終エンディング";
+ document.getElementById("choices").style.display="none";
+ document.getElementById("restart").style.display="block";
 
-  let result;
-  if(affection>=65){
-    result="【トサ・ラブエンド】\n「うちもあんたが好きぜよ！」千佳は笑顔であなたの手を握った。二人は高知の海へ旅行することに。恋の万有引力は、もう止められない。";
-  }else if(affection>=35){
-    result="【友達以上エンド】\n「また一緒にご飯でも行こうや」千佳は優しく微笑んだ。二人の関係は、まだこれから。";
-  }else{
-    result="【ニュートンも驚くすれ違いエンド】\n「ほいたら、また明日ね」千佳は職員室へ戻っていった。恋の引力はまだ弱かったようだ……。";
-  }
-  document.getElementById("message").textContent=result;
+ let result,face;
+
+ if(affection>=160){
+  face="💗";
+  result="【💗 トサ・ラブエンド 💗】\n\n「うちもあんたが大好きやきぃね！」\n\n千佳は満面の笑みであなたの手を握った。\n二人は高知へ旅行することに。\nカツオのたたきを食べながら、これからの未来を語り合う。\n\n恋の万有引力は、もう止められない。";
+ }else if(affection>=110){
+  face="🥰";
+  result="【💕 両想いエンド 💕】\n\n「これからも、うちのそばにおってね」\n\n千佳は照れくさそうに笑った。\n二人は少しずつ距離を縮めていく。\nこれからどんな未来が待っているのだろう。";
+ }else if(affection>=65){
+  face="😊";
+  result="【🌸 友達以上エンド 🌸】\n\n「また一緒にご飯でも行こうや」\n\n千佳は優しく微笑んだ。\n二人の関係はまだこれから。\n恋の可能性は残されている。";
+ }else if(affection>=30){
+  face="👩🏻‍🏫";
+  result="【📚 信頼関係エンド 📚】\n\n「これからも仕事、頑張ろうねえ」\n\n千佳はあなたを信頼できる仲間だと思っているようだ。\n恋愛にはまだ時間が必要らしい。";
+ }else{
+  face="😢";
+  result="【🌧️ ニュートンも驚くすれ違いエンド 🌧️】\n\n「ほいたら、また明日ね」\n\n千佳は少し寂しそうに職員室へ戻っていった。\n恋の引力は最後まで弱かったようだ……。";
+ }
+
+ document.getElementById("face").textContent=face;
+ document.getElementById("message").textContent=result;
 }
 
 function restart(){
-  affection=20;
-  day=0;
-  location.reload();
+ affection=20;
+ day=0;
+ document.getElementById("choices").style.display="grid";
+ document.getElementById("restart").style.display="none";
+ updateStatus();
+ showScene();
 }
+
+showScene();
 </script>
 </body>
 </html>
