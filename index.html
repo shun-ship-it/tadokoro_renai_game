@@ -107,6 +107,7 @@ let day=0;
 let dialogueLines=[];
 let lineIndex=0;
 let dialogueMode="";
+let playerName="";
 
 const scenes=[
 
@@ -358,6 +359,52 @@ function renderDialogue(){
  }
 }
 
+function askPlayerName(){
+
+ const box=document.getElementById("choices");
+
+ box.innerHTML="";
+
+ const input=document.createElement("input");
+ input.type="text";
+ input.placeholder="あなたの名前を入力してください";
+ input.maxLength=20;
+
+ input.style.width="100%";
+ input.style.padding="14px";
+ input.style.borderRadius="10px";
+ input.style.border="1px solid #806b8e";
+ input.style.fontSize="16px";
+ input.style.marginBottom="10px";
+
+ const btn=document.createElement("button");
+ btn.textContent="名前を決定する";
+ btn.style.width="100%";
+ btn.style.textAlign="center";
+
+ btn.onclick=()=>{
+
+  const name=input.value.trim();
+
+  if(!name){
+   alert("名前を入力してね！");
+   return;
+  }
+
+  playerName=name;
+
+  document.getElementById("speaker").textContent="田所千佳";
+
+  startDialogue(
+   playerName+"さんやね！えい名前やねえ。\n\nこれからよろしく頼むがよ、"+playerName+"さん！",
+   "name"
+  );
+ };
+
+ box.appendChild(input);
+ box.appendChild(btn);
+}
+ 
 // 選択肢表示
 function showChoices(){
 
