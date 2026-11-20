@@ -304,7 +304,8 @@ function renderDialogue(){
  const message=document.getElementById("message");
  const box=document.getElementById("choices");
 
- message.textContent=dialogueLines[lineIndex];
+ message.textContent=
+ dialogueLines[lineIndex].replaceAll("{name}",playerName);
 
  box.innerHTML="";
 
@@ -357,6 +358,11 @@ function renderDialogue(){
  else if(dialogueMode==="ending"){
   document.getElementById("restart").style.display="block";
  }
+
+ else if(dialogueMode==="name"){
+ showChoices();
+}
+ 
 }
 
 function askPlayerName(){
@@ -406,6 +412,7 @@ function askPlayerName(){
 }
  
 // 選択肢表示
+
 function showChoices(){
 
  const s=scenes[day];
@@ -413,12 +420,27 @@ function showChoices(){
 
  box.innerHTML="";
 
+ // 第1日目は名前入力へ
+ if(day===0 && !playerName){
+
+  const btn=document.createElement("button");
+  btn.textContent="▶ 自己紹介をする";
+
+  btn.onclick=()=>{
+   document.getElementById("message").textContent=
+    "そういえば、まだあんたの名前を聞いちょらんかったねえ。教えてくれるかえ？";
+
+   askPlayerName();
+  };
+
+  box.appendChild(btn);
+  return;
+ }
+
  s.choices.forEach((choice,i)=>{
 
   const btn=document.createElement("button");
-
-  btn.textContent=
-   ["① ","② ","③ "][i]+choice[0];
+  btn.textContent=["① ","② ","③ "][i]+choice[0];
 
   btn.onclick=()=>choose(i);
 
