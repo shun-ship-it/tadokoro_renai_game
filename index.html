@@ -104,7 +104,9 @@ button:hover {background:#79516f;}
 <script>
 let affection=20;
 let day=0;
-
+let dialogueLines=[];
+let lineIndex=0;
+let dialogueMode="";
 
 const scenes=[
 
@@ -267,99 +269,212 @@ const scenes=[
 }
 ];
 
+
 function updateStatus(){
  document.getElementById("score").textContent=affection+" / 100";
  document.getElementById("bar").style.width=affection+"%";
 }
 
+// 会話を一文ずつに分割
+function splitDialogue(text){
+ return text
+ .replace(/\n+/g," ")
+ .match(/[^。！？]+[。！？]?/g)
+ .map(line=>line.trim())
+ .filter(line=>line.length>0);
+}
+
+// 会話開始
+function startDialogue(text,mode){
+ dialogueLines=splitDialogue(text);
+ lineIndex=0;
+ dialogueMode=mode;
+
+ document.getElementById("choices").innerHTML="";
+ document.getElementById("choices").style.display="grid";
+ document.getElementById("restart").style.display="none";
+
+ renderDialogue();
+}
+
+// 一文を表示
+function renderDialogue(){
+
+ const message=document.getElementById("message");
+ const box=document.getElementById("choices");
+
+ message.textContent=dialogueLines[lineIndex];
+
+ box.innerHTML="";
+
+ // まだ続きがある場合
+ if(lineIndex<dialogueLines.length-1){
+
+  const btn=document.createElement("button");
+  btn.textContent="▶ 次のセリフへ";
+  btn.style.textAlign="center";
+
+  btn.onclick=()=>{
+   lineIndex++;
+   renderDialogue();
+  };
+
+  box.appendChild(btn);
+  return;
+ }
+
+ // 会話終了後の処理
+
+ if(dialogueMode==="intro"){
+  showChoices();
+ }
+
+ else if(dialogueMode==="response"){
+
+  const btn=document.createElement("button");
+
+  btn.textContent=
+   day===11
+   ?"💗 最終結果を見る"
+   :"▶ 次の日へ進む";
+
+  btn.style.textAlign="center";
+
+  btn.onclick=()=>{
+   day++;
+
+   if(day>=scenes.length){
+    ending();
+   }else{
+    showScene();
+   }
+  };
+
+  box.appendChild(btn);
+ }
+
+ else if(dialogueMode==="ending"){
+  document.getElementById("restart").style.display="block";
+ }
+}
+
+// 選択肢表示
+function showChoices(){
+
+ const s=scenes[day];
+ const box=document.getElementById("choices");
+
+ box.innerHTML="";
+
+ s.choices.forEach((choice,i)=>{
+
+  const btn=document.createElement("button");
+
+  btn.textContent=
+   ["① ","② ","③ "][i]+choice[0];
+
+  btn.onclick=()=>choose(i);
+
+  box.appendChild(btn);
+ });
+}
+
+// シーン表示
 function showScene(){
+
  const s=scenes[day];
 
  document.getElementById("day").textContent=s.title;
  document.getElementById("location").textContent=s.place;
  document.getElementById("face").textContent=s.face;
  document.getElementById("speaker").textContent="田所千佳";
- document.getElementById("message").textContent=s.intro;
 
- const box=document.getElementById("choices");
- box.innerHTML="";
-
- s.choices.forEach((choice,i)=>{
-  const btn=document.createElement("button");
-  btn.textContent=["① ","② ","③ "][i]+choice[0];
-  btn.onclick=()=>choose(i);
-  box.appendChild(btn);
- });
+ startDialogue(s.intro,"intro");
 }
 
+// 選択肢を選ぶ
 function choose(index){
+
  const s=scenes[day];
  const choice=s.choices[index];
 
  affection=Math.max(0,Math.min(100,
- affection+Number(choice[2])));
+  affection+Number(choice[2])
+ ));
 
  updateStatus();
 
  document.getElementById("speaker").textContent="田所千佳";
- document.getElementById("message").textContent=
- choice[1]+"\n\n（好感度 "+(choice[2].startsWith("-")?"":"+")+choice[2]+"）";
 
  document.getElementById("face").textContent=
- affection>=70?"🥰":affection>=40?"😊":"👩🏻‍🏫";
+  affection>=70?"🥰":
+  affection>=40?"😊":"👩🏻‍🏫";
 
- const box=document.getElementById("choices");
- box.innerHTML="";
+ const scoreText=
+  "\n（好感度 "+
+  (choice[2].startsWith("-")?"":"+")+
+  choice[2]+"）";
 
- const btn=document.createElement("button");
- btn.textContent=day===11?"💗 最終結果を見る":"▶ 次の日へ進む";
- btn.style.textAlign="center";
- btn.onclick=()=>{
-  day++;
-  if(day>=scenes.length){
-   ending();
-  }else{
-   showScene();
-  }
- };
- box.appendChild(btn);
+ startDialogue(choice[1]+scoreText,"response");
 }
 
+// エンディング
 function ending(){
+
  document.getElementById("day").textContent="最終日・エンディング";
  document.getElementById("location").textContent="二人の未来";
  document.getElementById("speaker").textContent="最終エンディング";
+
+ document.getElementById("choices").innerHTML="";
  document.getElementById("choices").style.display="none";
- document.getElementById("restart").style.display="block";
 
  let result,face;
 
  if(affection>=160){
+
   face="💗";
-  result="【💗 トサ・ラブエンド 💗】\n\n「うちもあんたが大好きやきぃね！」\n\n千佳は満面の笑みであなたの手を握った。\n二人は高知へ旅行することに。\nカツオのたたきを食べながら、これからの未来を語り合う。\n\n恋の万有引力は、もう止められない。";
+
+  result="【💗 トサ・ラブエンド 💗】\n\n「うちもあんたが大好きやきぃね！」\n\n千佳は満面の笑みであなたの手を握った。\n\n二人は高知へ旅行することに。\n\nカツオのたたきを食べながら、これからの未来を語り合う。\n\n恋の万有引力は、もう止められない。";
+
  }else if(affection>=110){
+
   face="🥰";
-  result="【💕 両想いエンド 💕】\n\n「これからも、うちのそばにおってね」\n\n千佳は照れくさそうに笑った。\n二人は少しずつ距離を縮めていく。\nこれからどんな未来が待っているのだろう。";
+
+  result="【💕 両想いエンド 💕】\n\n「これからも、うちのそばにおってね」\n\n千佳は照れくさそうに笑った。\n\n二人は少しずつ距離を縮めていく。\n\nこれからどんな未来が待っているのだろう。";
+
  }else if(affection>=65){
+
   face="😊";
-  result="【🌸 友達以上エンド 🌸】\n\n「また一緒にご飯でも行こうや」\n\n千佳は優しく微笑んだ。\n二人の関係はまだこれから。\n恋の可能性は残されている。";
+
+  result="【🌸 友達以上エンド 🌸】\n\n「また一緒にご飯でも行こうや」\n\n千佳は優しく微笑んだ。\n\n二人の関係はまだこれから。\n\n恋の可能性は残されている。";
+
  }else if(affection>=30){
+
   face="👩🏻‍🏫";
-  result="【📚 信頼関係エンド 📚】\n\n「これからも仕事、頑張ろうねえ」\n\n千佳はあなたを信頼できる仲間だと思っているようだ。\n恋愛にはまだ時間が必要らしい。";
+
+  result="【📚 信頼関係エンド 📚】\n\n「これからも仕事、頑張ろうねえ」\n\n千佳はあなたを信頼できる仲間だと思っているようだ。\n\n恋愛にはまだ時間が必要らしい。";
+
  }else{
+
   face="😢";
-  result="【🌧️ ニュートンも驚くすれ違いエンド 🌧️】\n\n「ほいたら、また明日ね」\n\n千佳は少し寂しそうに職員室へ戻っていった。\n恋の引力は最後まで弱かったようだ……。";
+
+  result="【🌧️ ニュートンも驚くすれ違いエンド 🌧️】\n\n「ほいたら、また明日ね」\n\n千佳は少し寂しそうに職員室へ戻っていった。\n\n恋の引力は最後まで弱かったようだ……。";
  }
 
  document.getElementById("face").textContent=face;
- document.getElementById("message").textContent=result;
+
+ startDialogue(result,"ending");
 }
 
+// ゲーム再スタート
 function restart(){
+
  affection=20;
  day=0;
+
  document.getElementById("choices").style.display="grid";
  document.getElementById("restart").style.display="none";
+
  updateStatus();
  showScene();
 }
